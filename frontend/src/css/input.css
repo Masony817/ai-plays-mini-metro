@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for the game */
+@layer components {
+  .game-container {
+    @apply bg-white border-2 border-gray-300 rounded-lg p-5 min-h-[400px] flex items-center justify-center;
+  }
+  
+  .app-container {
+    @apply max-w-6xl mx-auto text-center;
+  }
+  
+  .game-title {
+    @apply text-game-primary text-4xl mb-8 font-bold;
+  }
+}
+
+@layer base {
+  body {
+    @apply font-sans m-0 p-5 bg-game-bg;
+  }
+}

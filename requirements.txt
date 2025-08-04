@@ -1,0 +1,15 @@
+# Backend dependencies
+fastapi
+uvicorn[standard]
+pydantic
+
+# PyTorch and ML dependencies
+torch
+torchvision
+numpy
+matplotlib
+
+# Development dependencies
+pytest
+black
+flake8
