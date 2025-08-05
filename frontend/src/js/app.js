@@ -29,18 +29,45 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function drawBackgroundMap(canvasContext, canvas, showGrid) {
+    console.log('Starting drawBackgroundMap...');
     let riverMap = null;
 
     const mapBackground = new Image();
     mapBackground.src = "src/assets/london-map.png";
+    console.log('Loading map image from:', mapBackground.src);
+    
     mapBackground.onload = () => {
+        console.log('Map image loaded successfully');
         canvasContext.drawImage(mapBackground, 0, 0, canvas.width, canvas.height);
+        console.log('Map drawn to canvas');
 
         const imageData = canvasContext.getImageData(0,0, canvas.width, canvas.height);
+        console.log('Got image data, dimensions:', canvas.width, 'x', canvas.height);
+        
         riverMap  = createRiverMap(imageData.data, canvas.width, canvas.height);
+        console.log('River map created');
 
-        if (!showGrid) return; // not currntely working 
+        if (!showGrid) {
+            console.log('Grid display disabled, returning');
+            return;
+        }
+
+        console.log('River map:', riverMap);
+
+        riverMap.forEach((isRiver, index)=>{
+            console.log('Checking if pixel is river...', isRiver);
+            if (isRiver) {
+                const x = index % canvas.width;
+                const y = Math.floor(index / canvas.width);
+                console.log('Drawing river at:', x, y);
+                canvasContext.fillStyle = "red";
+                canvasContext.fillRect(x, y, 1, 1);
+            }
+        })
+
+        console.log('Drawing grid...');
         drawGrid(canvasContext, canvas);
+        console.log('Grid drawing complete');
     };
 }
 
@@ -68,7 +95,8 @@ function drawGrid(canvasContext, canvas) {
 
 //river detection funcitons
 function createRiverMap(pixels, width, height) {
-    const  riverMap = new Array(width * height);
+    console.log('Creating river map...');
+    const riverMap = new Array(width * height);
 
     for (let y = 0; y < height; y++){
         for (let x = 0; x < width; x++){
@@ -78,8 +106,7 @@ function createRiverMap(pixels, width, height) {
             const b = pixels[index + 2];
 
             const isRiver = !isBackgroundColor(r, g, b);
-            riverMap(y * width + x) = isRiver;
-
+            riverMap[y * width + x] = isRiver;
         }
     }
 
@@ -88,7 +115,7 @@ function createRiverMap(pixels, width, height) {
 
 function isBackgroundColor(r, g, b){
     //london background color is f0f0f0 or 240,240,240
-    const tolerance = 5; //for png anti-aliasing
+    const tolerance = 10; //for png anti-aliasing
     return Math.abs(r - 240) <= tolerance && 
            Math.abs(g - 240) <= tolerance && 
            Math.abs(b - 240) <= tolerance;
