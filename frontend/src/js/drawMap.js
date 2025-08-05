@@ -27,17 +27,17 @@ export function drawBackgroundMap(canvasContext, canvas, showGrid) {
         let waterMap  = createWaterMap(imageData.data, canvas.width, canvas.height);
         console.log('Water map created');
 
-        //draw the water map on the canvas
+        //debug -- draw the water map on the canvas
         waterMap.forEach((isWater, index)=>{
             if (isWater) {
                 const x = index % canvas.width;
                 const y = Math.floor(index / canvas.width);
-                canvasContext.fillStyle = "blue";
+                canvasContext.fillStyle = "red";
                 canvasContext.fillRect(x, y, 1, 1);
             }
         })
 
-        //debug grid -- move to a toggle later 
+        //debug -- move to a toggle later 
         if (!showGrid) {return;}
         console.log('Drawing grid...');
         drawGrid(canvasContext, canvas);
@@ -45,6 +45,8 @@ export function drawBackgroundMap(canvasContext, canvas, showGrid) {
     };
 }
 
+
+//move to a toggle later or be called there
 function drawGrid(canvasContext, canvas) {
     canvasContext.strokeStyle = "#A0A0A0FF";
     canvasContext.lineWidth = 0.015;
