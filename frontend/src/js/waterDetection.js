@@ -126,7 +126,7 @@ function cleanupWaterMap(waterMap, width, height) {
     // that are not part of the main body of water
     // uses optimized union-find with rank and path compression
     
-    const minAreaSize = 10;
+    const minAreaSize = 75; // px determined for connection to main body of water
     const arrayLength = width * height;
     const labels = new Uint32Array(arrayLength);
     let currentLabel = 1;
@@ -186,14 +186,14 @@ function cleanupWaterMap(waterMap, width, height) {
         }
     }
     
-    // Pass 1 - assign labels and build union-find structure
+    // assign labels and build uf structure
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
             const index = y * width + x;
             
             if (!waterMap[index]) continue;
             
-            // Use bit operations for bounds checking (faster than separate conditions)
+            // bit operations for bounds checking -- faster than conditions
             const hasLeft = x > 0;
             const hasTop = y > 0;
             
@@ -204,21 +204,21 @@ function cleanupWaterMap(waterMap, width, height) {
             const topLabel = hasTop && waterMap[topIndex] ? labels[topIndex] : 0;
             
             if (leftLabel === 0 && topLabel === 0) {
-                // New component
+                // new component
                 labels[index] = currentLabel;
                 makeSet(currentLabel);
                 componentSizes[currentLabel] = 1;
                 currentLabel++;
             } else if (leftLabel === 0) {
-                // Extend top component
+                // extend top component -- no new components created
                 labels[index] = topLabel;
                 componentSizes[findRoot(topLabel)]++;
             } else if (topLabel === 0) {
-                // Extend left component
+                // extend left component -- no new components created
                 labels[index] = leftLabel;
                 componentSizes[findRoot(leftLabel)]++;
             } else {
-                // Both neighbors have labels - union them
+                // both neighbors have labels - union them
                 const unionRoot = union(leftLabel, topLabel);
                 labels[index] = unionRoot;
                 componentSizes[unionRoot]++;
@@ -226,13 +226,13 @@ function cleanupWaterMap(waterMap, width, height) {
         }
     }
     
-    // Cache root labels to avoid repeated findRoot calls
+    // cache root labels to avoid repeated findRoot calls
     const rootCache = new Uint32Array(currentLabel);
     for (let i = 1; i < currentLabel; i++) {
         rootCache[i] = findRoot(i);
     }
     
-    // Final pass - remove small components using cached roots
+    // remove small components using cached roots
     for (let i = 0; i < arrayLength; i++) {
         if (labels[i] > 0) {
             const rootLabel = rootCache[labels[i]];
