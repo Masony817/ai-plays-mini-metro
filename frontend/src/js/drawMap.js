@@ -120,37 +120,26 @@ export function drawBackgroundMap(canvasContext, canvas, camera) {
         });
     }
 
-    //debug -- move to a toggle later -- add showGrid to the function call if going to use
-    // if (!showGrid) {return;}
-    // console.log('Drawing grid...');
-    // drawGrid(canvasContext, canvas, 25); // 25px grid boxes
-    // console.log('Grid drawing complete');
-
     canvasContext.restore();
 }
 
+export function drawGrid(canvasContext, canvas, size = 25) {
+    canvasContext.strokeStyle = "#A0A0A0FF";
+    canvasContext.lineWidth = 0.5;
+    
+    // Vertical lines
+    canvasContext.beginPath();
+    for (let x = 0; x < canvas.width; x += size) {
+        canvasContext.moveTo(x, 0);
+        canvasContext.lineTo(x, canvas.height);
+    }
+    canvasContext.stroke();
 
-
-
-// //move to a toggle later or be called there
-// function drawGrid(canvasContext, canvas, size) {
-
-//     canvasContext.strokeStyle = "#A0A0A0FF";
-//     canvasContext.lineWidth = 0.5;
-//     console.log(canvasContext.lineWidth);
-//     // all vertical lines
-//     canvasContext.beginPath();
-//     for (let x = 0; x < canvas.width; x += size) {
-//         canvasContext.moveTo(x, 0);
-//         canvasContext.lineTo(x, canvas.height);
-//     }
-//     canvasContext.stroke();
-
-//     // all horizontal lines  
-//     canvasContext.beginPath();
-//     for (let y = 0; y < canvas.height; y += size) {
-//         canvasContext.moveTo(0, y);
-//         canvasContext.lineTo(canvas.width, y);
-//     }
-//     canvasContext.stroke();
-// }
+    // Horizontal lines  
+    canvasContext.beginPath();
+    for (let y = 0; y < canvas.height; y += size) {
+        canvasContext.moveTo(0, y);
+        canvasContext.lineTo(canvas.width, y);
+    }
+    canvasContext.stroke();
+}

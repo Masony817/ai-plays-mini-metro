@@ -3,33 +3,19 @@
 
 const MOVE_STEP = 10;    // px per key press
 const ZOOM_STEP = 0.05;  // zoom delta per press
-const STEPS_FILE_PATH = 'src/assets/cameraSteps.json';
-// Global flag consumed by drawMap.js to decide if it should overlay water pixels
-window.DEBUG_SHOW_WATER = true;
-window.DEBUG_SHOW_GRID = true;
-window.DEBUG_SHOW_VIEWPORT_INFO = true;
 
-export function setupDebug(camera) {
-  const savedSteps = [null, null, null, null];
+export function setupDebug(camera, debugInitialized) {
+  // Enable default debug overlays when debug mode is activated
+  // Global flag consumed by drawMap.js
+  window.DEBUG_SHOW_WATER = debugInitialized;
+  window.DEBUG_SHOW_VIEWPORT_INFO = debugInitialized;
+  window.DEBUG_SHOW_GRID = debugInitialized;
+
+  //camera controls
+  window.DEBUG_CAMERA = debugInitialized;
+
+  const savedSteps = [null, null, null, null]; // 4 steps
   let sPressed = false;
-
-  // Load previously saved steps (if the JSON asset exists)
-  (async () => {
-    try {
-      const resp = await fetch(STEPS_FILE_PATH);
-      if (resp.ok) {
-        const data = await resp.json();
-        if (Array.isArray(data)) {
-          data.slice(0, 4).forEach((step, idx) => {
-            if (step && typeof step === 'object') savedSteps[idx] = step;
-          });
-          console.log('[debug] loaded camera steps', savedSteps);
-        }
-      }
-    } catch (_) {
-      console.info('[debug] no cameraSteps.json found – starting fresh');
-    }
-  })();
 
   function animateCameraTo(target) {
     const start = { x: camera.x, y: camera.y, zoom: camera.zoom };
@@ -48,19 +34,10 @@ export function setupDebug(camera) {
     requestAnimationFrame(step);
   }
 
-  function downloadSteps() {
-    const blob = new Blob([JSON.stringify(savedSteps, null, 2)], {
-      type: 'application/json'
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'cameraSteps.json';
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
+  // camera controls
   document.addEventListener('keydown', (e) => {
+    if (!window.DEBUG_CAMERA) return;
+    
     // modifier for saving
     if (e.key === 's') {
       sPressed = true;
@@ -105,26 +82,30 @@ export function setupDebug(camera) {
         }
         break;
       }
-      case 'd':
-        if (sPressed) downloadSteps();
-        break;
-      case 'w': // toggle water overlay visibility
-        if (sPressed) {
-          window.DEBUG_SHOW_WATER = !window.DEBUG_SHOW_WATER;
-          console.log(`[debug] water overlay ${window.DEBUG_SHOW_WATER ? 'enabled' : 'disabled'}`);
-        }
-        break;
-      case 'v': // toggle viewport info visibility
-        if (sPressed) {
-          window.DEBUG_SHOW_VIEWPORT_INFO = !window.DEBUG_SHOW_VIEWPORT_INFO;
-          console.log(`[debug] viewport info ${window.DEBUG_SHOW_VIEWPORT_INFO ? 'enabled' : 'disabled'}`);
-        }
-        break;
+              case 'w': // toggle water overlay visibility
+          if (sPressed) {
+            window.DEBUG_SHOW_WATER = !window.DEBUG_SHOW_WATER;
+            console.log(`[debug] water overlay ${window.DEBUG_SHOW_WATER ? 'enabled' : 'disabled'}`);
+          }
+          break;
+        case 'v': // toggle viewport info visibility
+          if (sPressed) {
+            window.DEBUG_SHOW_VIEWPORT_INFO = !window.DEBUG_SHOW_VIEWPORT_INFO;
+            console.log(`[debug] viewport info ${window.DEBUG_SHOW_VIEWPORT_INFO ? 'enabled' : 'disabled'}`);
+          }
+          break;
+        case 'g': // toggle grid overlay visibility
+          if (sPressed) {
+            window.DEBUG_SHOW_GRID = !window.DEBUG_SHOW_GRID;
+            console.log(`[debug] grid overlay ${window.DEBUG_SHOW_GRID ? 'enabled' : 'disabled'}`);
+          }
+          break;
       default:
         break;
     }
   });
 
+  // camera controls
   document.addEventListener('keyup', (e) => {
     if (e.key === 's') sPressed = false;
   });
@@ -145,13 +126,14 @@ export function drawViewportInfo(context, camera) {
 }
 
 /*
-* DEBUG CAMERA CONTROLS
-* --------------------------------------------------------------------------
-* Arrow Keys  : pan camera (world units)
-* i / k       : zoom in / out
-* Hold "s" + 1-4 : save current camera state to a step
-* Keys 1-4    : move (with easing) to saved camera step
-* Hold "s" + w : toggle water overlay visibility
-* Hold "s" + v : toggle viewport info visibility
-* --------------------------------------------------------------------------
-*/
+ * DEBUG CONTROLS
+ * --------------------------------------------------------------------------
+ * Arrow Keys  : pan camera (world units)
+ * i / k       : zoom in / out
+ * Hold "s" + 1-4 : save current camera state to a step
+ * Keys 1-4    : move (with easing) to saved camera step
+ * Hold "s" + w : toggle water overlay visibility
+ * Hold "s" + v : toggle viewport info visibility
+ * Hold "s" + g : toggle grid overlay visibility
+ * --------------------------------------------------------------------------
+ */

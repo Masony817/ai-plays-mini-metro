@@ -1,4 +1,4 @@
-import {drawBackgroundMap, initializeMap} from './drawMap.js';
+import {drawBackgroundMap, initializeMap, drawGrid} from './drawMap.js';
 import { setupDebug, drawViewportInfo as debugViewportInfo } from './debug.js';
 
 // app init
@@ -29,8 +29,19 @@ document.addEventListener('DOMContentLoaded', function() {
         height: canvas.height,
     };
 
-    // Initialise debug utilities (camera controls, overlays)
-setupDebug(camera);
+        // Debug utilities are dormant by default.
+    let debugInitialized = false;
+
+    // Hold Shift + D to enable debug utilities at runtime
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'D' && e.shiftKey && !debugInitialized) {
+            setupDebug(camera, debugInitialized = true);
+            console.log('[debug] tools initialised');
+        } else if (e.key === 'D' && e.shiftKey && debugInitialized) {
+            setupDebug(camera, debugInitialized = false);
+            console.log('[debug] tools disabled');
+        }
+    });
 
     // set canvas to viewport dimensions
     canvas.width = window.innerWidth;
@@ -74,29 +85,22 @@ function render(canvasContext, canvas, camera){
     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
 
     drawBackgroundMap(canvasContext, canvas, camera);
+    
+    // Debug grid overlay (global game feature but mainly controlled by debug for now)
+    if (window.DEBUG_SHOW_GRID) {
+        drawGrid(canvasContext, canvas, 25);
+    }
+    
     debugViewportInfo(canvasContext, camera);
 
     requestAnimationFrame(() => render(canvasContext, canvas, camera));
 }
 
-/* legacy debug viewport info kept for reference but replaced by debug.js drawViewportInfo
-function drawViewportInfo(context, camera) {
-    context.save();
-    // Reset transformations to draw UI elements in screen space
-    context.setTransform(1, 0, 0, 1, 0, 0);
-    
-    context.fillStyle = 'black';
-    context.font = '14px Arial';
-    context.fillText(`Viewport: x=${Math.round(camera.x)}, y=${Math.round(camera.y)}, zoom=${camera.zoom.toFixed(2)}`, 10, 20);
-    
-    context.restore();
-}
-*/
+
 /*
 - ✅ fix the river detection -- grid doesnt matter for it
-- add a zoom effect (add camera?) to the canvas where it starts small and gets progressively more
+- ✅ add a zoom effect (add camera?) to the canvas where it starts small and gets progressively more
 of the canvas in view
-- add a grid show button
-- add a map name up top
+- ✅ add a grid show button (debug controled for now)
 - add a time element
  */
