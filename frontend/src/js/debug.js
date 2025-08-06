@@ -5,8 +5,8 @@ const MOVE_STEP = 10;    // px per key press
 const ZOOM_STEP = 0.05;  // zoom delta per press
 
 export function setupDebug(camera, debugInitialized) {
-  // Enable default debug overlays when debug mode is activated
-  // Global flag consumed by drawMap.js
+  // enable default debug overlays when debug mode is activated
+  // global flag consumed by drawMap.js
   window.DEBUG_SHOW_WATER = debugInitialized;
   window.DEBUG_SHOW_VIEWPORT_INFO = debugInitialized;
   window.DEBUG_SHOW_GRID = debugInitialized;

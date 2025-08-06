@@ -29,10 +29,10 @@ document.addEventListener('DOMContentLoaded', function() {
         height: canvas.height,
     };
 
-        // Debug utilities are dormant by default.
+    // debug utilities are off by default.
     let debugInitialized = false;
 
-    // Hold Shift + D to enable debug utilities at runtime
+    // hold shift + d to enable debug utilities at runtime
     document.addEventListener('keydown', (e) => {
         if (e.key === 'D' && e.shiftKey && !debugInitialized) {
             setupDebug(camera, debugInitialized = true);
@@ -80,13 +80,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 function render(canvasContext, canvas, camera){
-    // Clear the entire canvas before drawing the next frame so debug overlays & text don’t pile up
+    // clear the entire canvas before drawing the next frame so ui elements dont pile up
     canvasContext.setTransform(1, 0, 0, 1, 0, 0); // reset transform to default
     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
 
     drawBackgroundMap(canvasContext, canvas, camera);
     
-    // Debug grid overlay (global game feature but mainly controlled by debug for now)
+    // debug grid overlay (global game feature but mainly controlled by debug for now)
     if (window.DEBUG_SHOW_GRID) {
         drawGrid(canvasContext, canvas, 25);
     }

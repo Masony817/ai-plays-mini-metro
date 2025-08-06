@@ -28,40 +28,40 @@ export function initializeMap(canvasContext, canvas){
         console.log('Loading map image from:', mapBackground.src);
 
         mapBackground.onload = () => {
-            // Store original image dimensions
+            // original image dimensions
             mapCache.originalWidth = mapBackground.naturalWidth;
             mapCache.originalHeight = mapBackground.naturalHeight;
             
-            // Pre-calculate water map scaling factors
+            // water map scale -- original to canvas
             mapCache.waterMapScaleX = mapCache.originalWidth / canvas.width;
             mapCache.waterMapScaleY = mapCache.originalHeight / canvas.height;
 
-            // Create an offscreen canvas at original image resolution for water map
+            // offscreen canvas for water map at original rez 
             const offscreenCanvas = document.createElement('canvas');
             offscreenCanvas.width = mapCache.originalWidth;
             offscreenCanvas.height = mapCache.originalHeight;
             const offscreenContext = offscreenCanvas.getContext('2d');
 
-            // Draw image at original resolution
+            // img at original rez 
             offscreenContext.drawImage(mapBackground, 0, 0);
 
-            // Get image data at original resolution for water map
+            // image data at original rez
             const imageData = offscreenContext.getImageData(0, 0, mapCache.originalWidth, mapCache.originalHeight);
 
-            // Create water map at original resolution
+            // water map at original rez
             mapCache.waterMap = createWaterMap(imageData.data, mapCache.originalWidth, mapCache.originalHeight);
 
-            // Create scaled image for performance
+            // scaled image for performance
             const scaledCanvas = document.createElement('canvas');
             scaledCanvas.width = canvas.width;
             scaledCanvas.height = canvas.height;
             const scaledContext = scaledCanvas.getContext('2d');
             
-            // Draw scaled image to cache
+            // scaled image to cache
             scaledContext.drawImage(mapBackground, 0, 0, canvas.width, canvas.height);
             mapCache.scaledImage = scaledCanvas;
 
-            // add to cache
+            // add all to cache and resolve
             mapCache.isLoaded = true;
             resolve(mapCache);
         }
@@ -78,11 +78,11 @@ export function recreateScaledImage(canvas) {
         return;
     }
     
-    // Update water map scale factors
+    // water map scale -- original to canvas
     mapCache.waterMapScaleX = mapCache.originalWidth / canvas.width;
     mapCache.waterMapScaleY = mapCache.originalHeight / canvas.height;
     
-    // Recreate scaled image
+    // recreate scaled image
     const scaledCanvas = document.createElement('canvas');
     scaledCanvas.width = canvas.width;
     scaledCanvas.height = canvas.height;
@@ -98,15 +98,15 @@ export function drawBackgroundMap(canvasContext, canvas, camera) {
         return;
     }
 
-    // Apply current camera settings – zoom then pan
+    // apply current camera settings – zoom then pan
     canvasContext.save();
-    canvasContext.scale(camera.zoom, camera.zoom); // zoom first
-    canvasContext.translate(-camera.x, -camera.y); // then translate to pan
+    canvasContext.scale(camera.zoom, camera.zoom);
+    canvasContext.translate(-camera.x, -camera.y); 
 
-    // Draw the cached scaled image
+    // draw the cached scaled image
     canvasContext.drawImage(mapCache.scaledImage, 0, 0);
 
-    // Debug overlay – draw water map pixels if enabled by debug.js
+    // debug overlay – draw water map pixels if enabled by debug.js
     if (window.DEBUG_SHOW_WATER) {
         mapCache.waterMap.forEach((isWater, index) => {
             if (isWater) {
@@ -127,7 +127,7 @@ export function drawGrid(canvasContext, canvas, size = 25) {
     canvasContext.strokeStyle = "#A0A0A0FF";
     canvasContext.lineWidth = 0.5;
     
-    // Vertical lines
+    // vertical lines
     canvasContext.beginPath();
     for (let x = 0; x < canvas.width; x += size) {
         canvasContext.moveTo(x, 0);
@@ -135,7 +135,7 @@ export function drawGrid(canvasContext, canvas, size = 25) {
     }
     canvasContext.stroke();
 
-    // Horizontal lines  
+    // horizontal lines  
     canvasContext.beginPath();
     for (let y = 0; y < canvas.height; y += size) {
         canvasContext.moveTo(0, y);
